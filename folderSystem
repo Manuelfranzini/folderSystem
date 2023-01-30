@@ -1,0 +1,176 @@
+// @purpose     To see relations from a perspective.
+
+/* Path methods:
+ * addLevel(String fromLevel)
+ * addOption()
+ * removeLevel(String fromOption)
+ * remove(String toRemove)
+ * removeLabel(String key)
+ * setLabel(String key, String value)
+ * printPath()
+ * getPerspective()      > String
+ * getOptionLabels()        > ArrayList<String> 
+ * getLabel(String key)     > String
+ * getLowerLevel()      > String
+ * getLevelOptions      > ArrayList<String> 
+ * setLabel(String key, String value)
+ * moveTo(String Perspective)
+ */
+
+// Imports
+package SystemTools;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Arrays;
+
+public class Path
+{
+    // Collections
+    private HashMap<String, HashMap<String, String>> path;  //<ID<Label,Content>>
+    private String perspective;
+
+    public Path()
+    {
+        // Setup collections
+        path = new HashMap<String, HashMap<String, String>>();
+
+        // Setup default path
+        perspective = "0";
+        path.put(perspective, new HashMap<String, String>());
+    }
+
+    // Add one new level
+    public String addLevel(String fromOption)
+    {
+        path.put(fromOption.concat(".0"), new HashMap<String, String>());
+        return fromOption.concat(".0");
+    }
+
+    // Add optin on same level
+    public String addOption(String fromOption){
+        int count = 0;
+        String searched = getLowerLevel(fromOption)+"."+count;
+        while(path.containsKey(searched)==true){
+            count++;
+            searched = getLowerLevel(searched)+"."+count;
+        }
+        path.put(searched, new HashMap<String, String>());
+        return searched;
+    }
+
+    // remove one option
+    public void removeOption(String option)
+    {
+        path.remove(option);
+    }
+
+    // remove all options based on one option
+    public void removeLevel(String fromOption){
+        ArrayList<String> set = new ArrayList<String>();
+        for(String x:path.keySet()){
+            set.add(x);
+        }
+        for(String x:set){
+            if(x.indexOf(fromOption) == 0){
+                path.remove(x);
+            }
+        }
+    }
+
+    // Getter methods
+    public String getPerspective()
+    {
+        return perspective;
+    }
+
+    public ArrayList<String> getOptionLabels()
+    {
+        ArrayList<String> values = new ArrayList<>();
+        if(path.get(perspective).keySet() != null){
+            for(String x:path.get(perspective).keySet()){
+                values.add(x);
+            }
+        }
+        if(values.size() > 0){
+            return values;
+        }
+        return null;
+    }
+
+    // Get Label value
+    public String getLabel(String key)
+    {
+        return path.get(perspective).get(key);
+    }
+
+    // Get first lower level
+    public String getLowerLevel(String fromOption)
+    {
+        if(fromOption.lastIndexOf(".") != -1){
+            return fromOption.substring(0,fromOption.lastIndexOf("."));
+        } else {
+            return fromOption;
+        }
+    }
+
+    // Get options on level
+    public ArrayList<String> getLevelOptions(String fromOption){
+        ArrayList<String> set = new ArrayList<String>();
+        ArrayList<String> newSet = new ArrayList<String>();
+        ArrayList<String> lastSet = new ArrayList<String>();
+        for(String x:path.keySet()){
+            set.add(x);
+        }
+        for(String x:set){
+            if(x.indexOf(fromOption) == 0){
+                newSet.add(x);
+            }
+        }
+        for(String x:newSet){
+            int count = x.length() - x.replaceAll("[.!?]+", "").length();
+            int Count = fromOption.length() - fromOption.replaceAll("[.!?]+", "").length();
+            Count++;
+            if(count == Count){
+                lastSet.add(x);
+            }
+        }
+        return lastSet;
+    }
+
+    // Seter methods
+    public void setLabel(String key, String value)
+    {
+        path.get(perspective).put(key, value);
+    }
+
+    // remove label
+    public void removeLabel(String key)
+    {
+        path.get(perspective).remove(key);
+    }
+
+    // Move to
+    public void moveTo(String Perspective)
+    {
+        perspective = Perspective;
+    }
+
+    // Print whole path
+    public void printPath()
+    {
+        System.out.println("perspective = " + perspective);
+        path.forEach((key, value) -> {
+                System.out.println(key + " = " + value + " ");
+            });
+    }
+
+    public ArrayList<String> printPathAsStringArray()
+    {
+        ArrayList<String> toReturn = new ArrayList<String>();
+        path.forEach((key, value) -> {
+                toReturn.add(key + " = " + value + " | ");
+            });
+        return toReturn;
+    }
+}
